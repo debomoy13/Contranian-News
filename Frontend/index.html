@@ -11,7 +11,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
     
     <!-- CSS -->
-    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="styles.css?v=2" />
   </head>
   <body>
     <div class="app-container">
@@ -31,29 +31,43 @@
       <!-- Navigation Tabs -->
       <div class="nav-container">
         <div class="nav-tabs">
-          <button class="nav-tab active">Browse Articles</button>
-          <button class="nav-tab">Paste Your Own Text</button>
+          <button class="nav-tab active" id="tab-browse">Browse Articles</button>
+          <button class="nav-tab" id="tab-paste">Paste Your Own Text</button>
         </div>
       </div>
       
       <!-- Main Content Area -->
       <main>
-        <!-- Filters -->
-        <div class="filters-container">
-          <button class="pill active">All Topics</button>
-          <button class="pill">Technology</button>
-          <button class="pill">Climate</button>
-          <button class="pill">Economy</button>
-          <button class="pill">Health</button>
-          <button class="pill">Immigration</button>
-        </div>
+        <!-- Browse Articles Section -->
+        <section id="section-browse">
+          <!-- Filters -->
+          <div class="filters-container">
+            <button class="pill active">All Topics</button>
+            <button class="pill">Technology</button>
+            <button class="pill">Climate</button>
+            <button class="pill">Economy</button>
+            <button class="pill">Health</button>
+            <button class="pill">Immigration</button>
+          </div>
 
-        <!-- Content -->
-        <div class="content-area">
-          <p class="loading-text">Loading articles...</p>
-        </div>
+          <!-- Content -->
+          <div class="content-area">
+            <p class="loading-text">Loading articles...</p>
+          </div>
+        </section>
+
+        <!-- Paste Your Own Text Section -->
+        <section id="section-paste" style="display: none;">
+          <div class="paste-container">
+            <h2 class="paste-title font-serif">Analyze Your Own Text</h2>
+            <p class="paste-subtitle">Paste a news headline, article excerpt, or opinion piece to discover contrarian viewpoints.</p>
+            <textarea class="paste-textarea" placeholder="Paste your text here..."></textarea>
+            <button class="analyze-btn">Discover Opposing Views</button>
+          </div>
+        </section>
       </main>
 
     </div>
+    <script src="script.js"></script>
   </body>
 </html>

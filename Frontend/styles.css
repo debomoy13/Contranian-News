@@ -142,3 +142,61 @@ body {
   color: var(--text-secondary);
   letter-spacing: 0.1em;
 }
+
+/* Paste Section */
+.paste-container {
+  padding: 4rem 2rem;
+  max-width: 800px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.paste-title {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  color: #111;
+}
+
+.paste-subtitle {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  margin-bottom: 2rem;
+}
+
+.paste-textarea {
+  width: 100%;
+  min-height: 200px;
+  padding: 1.5rem;
+  font-family: 'Space Mono', monospace;
+  font-size: 1rem;
+  border: 1px solid var(--border-color);
+  background-color: transparent;
+  color: var(--text-primary);
+  border-radius: 4px;
+  resize: vertical;
+  margin-bottom: 2rem;
+}
+
+.paste-textarea:focus {
+  outline: none;
+  border-color: var(--accent-color);
+}
+
+.analyze-btn {
+  padding: 1rem 2.5rem;
+  font-family: 'Space Mono', monospace;
+  font-size: 1rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: white;
+  background-color: var(--accent-color);
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.analyze-btn:hover {
+  background-color: #b83d2a;
+}
