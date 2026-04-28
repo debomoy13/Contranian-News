@@ -9,12 +9,10 @@ tfidf_matrix = tfidf.fit_transform(df['clean_text'])
 
 similarity_matrix = cosine_similarity(tfidf_matrix)
 
-# ---------------- EXISTING FUNCTION (UNCHANGED) ----------------
 def contranian(index, top=3):
     target_label = df.iloc[index]['predicted']
     similarities = similarity_matrix[index]
 
-    # sort by similarity (highest first)
     similar_indices = similarities.argsort()[::-1]
 
     results = []
@@ -35,21 +33,18 @@ def contranian(index, top=3):
     return results
 
 
-# ---------------- NEW FUNCTION (FOR API) ----------------
 def contranian_from_text(text, top=3):
     clean = clean_text(text)
 
-    # vectorize input
     vec = tfidf.transform([clean])
 
-    # similarity with dataset
     similarities = cosine_similarity(vec, tfidf_matrix)[0]
 
-    # classify input
     tokens = clean.split()
 
-    # reuse your same logic indirectly via df structure
-    from pre_trained import get_sentiment  # assuming your function exists
+    from pre_trained import get_sentiment  
+
+
     target_label = get_sentiment(clean, tokens)
 
     similar_indices = similarities.argsort()[::-1]
@@ -82,8 +77,7 @@ def contranian_from_text(text, top=3):
         "results": results
     }
 
-
-# ---------------- TEST (OPTIONAL) ----------------
+ # TEST 
 if __name__ == "__main__":
     i = 0
 
