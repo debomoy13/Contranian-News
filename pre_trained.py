@@ -64,9 +64,8 @@ df['predicted'] = df.apply(
 y_true = df['classification']   # ground truth: -1, 0, 1
 y_pred = df['predicted']
 
-print("=== Results on all 19 rows ===")
+
 print(classification_report(y_true, y_pred, target_names=['negative', 'neutral', 'positive']))
-print(confusion_matrix(y_true, y_pred))
 
 # View predictions
 print(df[['title', 'classification', 'predicted', 'support_score', 'oppose_score']].to_string())

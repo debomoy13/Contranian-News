@@ -1,52 +1,51 @@
+# engine.py
+
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
-from pre_trained import clean_text
-from pre_trained import df
+from pre_trained import df, clean_text, classify
 
-tfidf=TfidfVectorizer(max_features=1000)
-tfidf_matrix=tfidf.fit_transform(df['clean_text'])
+tfidf = TfidfVectorizer(max_features=1000)
+tfidf_matrix = tfidf.fit_transform(df['clean_text'])
 
-similarity_matrix=cosine_similarity(tfidf_matrix)
+def get_contrarian_results(input_text, top=3):
+    clean = clean_text(input_text)
 
-def contranian(index, top=3):
-    target_label=df.iloc[index]['predicted']
-    similarities=similarity_matrix[index]
-    
+    # vectorize input
+    vec = tfidf.transform([clean])
 
-    #sort by similarity(highest first)
+    # similarity
+    similarities = cosine_similarity(vec, tfidf_matrix)[0]
 
-    similar_indices=similarities.argsort()[::-1]
+    # predict input stance
+    target_label = classify(input_text)
 
-    results=[]
+    sorted_indices = similarities.argsort()[::-1]
 
-    for i in similar_indices:
-        if i == index:
+    results = []
+
+    for i in sorted_indices:
+        if similarities[i] < 0.2:
             continue
 
+        # strict opposition
         if target_label == 1 and df.iloc[i]['predicted'] == -1:
-            results.append((i, similarities[i]))
+            results.append({
+                "title": df.iloc[i]['title'],
+                "similarity": float(similarities[i]),
+                "stance": -1
+            })
 
         elif target_label == -1 and df.iloc[i]['predicted'] == 1:
-            results.append((i, similarities[i]))
-            
+            results.append({
+                "title": df.iloc[i]['title'],
+                "similarity": float(similarities[i]),
+                "stance": 1
+            })
+
         if len(results) >= top:
             break
 
-    return results
-
-i = 0  # choose any article index
-
-results = contranian(i)
-
-print("INPUT ARTICLE:\n")
-print(df.iloc[i]['title'])
-print(df.iloc[i]['predicted'])
-
-print("\nCONTRARIAN ARTICLES:\n")
-
-for r in results:
-    i, score = r
-    print(df.iloc[i]['title'])
-    print("Predicted:", df.iloc[i]['predicted'])
-    print("Similarity:", score)
-    print("------")
+    return {
+        "input_stance": target_label,
+        "results": results
+    }
