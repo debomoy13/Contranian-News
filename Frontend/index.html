@@ -61,8 +61,12 @@
           <div class="paste-container">
             <h2 class="paste-title font-serif">Analyze Your Own Text</h2>
             <p class="paste-subtitle">Paste a news headline, article excerpt, or opinion piece to discover contrarian viewpoints.</p>
-            <textarea class="paste-textarea" placeholder="Paste your text here..."></textarea>
-            <button class="analyze-btn">Discover Opposing Views</button>
+            <textarea class="paste-textarea" id="custom-text-input" placeholder="Paste your text here..."></textarea>
+            <button class="analyze-btn" id="analyze-btn">Discover Opposing Views</button>
+            
+            <!-- Results Container -->
+            <div id="results-container" class="results-container" style="display: none;">
+            </div>
           </div>
         </section>
       </main>
