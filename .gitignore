@@ -1,3 +1,18 @@
-Data_news.xlsx
-data_news.xlsx
-file.py
+# Security
+.env
+
+# Datasets
+*.csv
+*.xlsx
+*.xls
+
+# ML Models
+*.pkl
+
+# Notebooks and Temp Files
+*.ipynb
+__pycache__/
+
+# Specific Scripts
+test_model.py
+pre_trained.py
