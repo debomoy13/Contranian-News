@@ -14,7 +14,6 @@ def analyze_text():
         return jsonify({"error": "No text provided"}), 400
         
     try:
-        # Get contrarian articles
         result = contranian_from_text(text, top=3)
         return jsonify(result), 200
     except Exception as e:

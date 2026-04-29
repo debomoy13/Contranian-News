@@ -6,15 +6,12 @@ import time
 import os
 from dotenv import load_dotenv
 
-# Load environment variables from .env file
 load_dotenv()
 
-# --- CONFIGURATION ---
 NEWS_API_KEY = os.getenv('NEWS_API_KEY')
 TOPICS = ['technology', 'AI risks', 'AI benefits', 'climate crisis', 'climate solutions', 'politics controversy', 'economic growth', 'market crash', 'health breakthrough']
-ARTICLES_PER_TOPIC = 40  # Total will be ~360 articles
+ARTICLES_PER_TOPIC = 40
 
-# --- SENTIMENT LOGIC (From your pre_trained.py) ---
 supportive_words = ['benefit', 'improve', 'enhance', 'support', 'help', 'personalize', 'effective', 'efficient', 'innovative', 'accessible', 'opportunity', 'revolutionize', 'bridge', 'inclusive', 'empower', 'potential', 'success', 'breakthrough', 'advance', 'growth', 'positive', 'win', 'excellent', 'future', 'transform', 'visionary', 'leader']
 opposing_words = ['harm', 'risk', 'cheat', 'replace', 'danger', 'mislead', 'bias', 'concern', 'threat', 'plagiarism', 'dependency', 'decline', 'weaken', 'destroy', 'erosion', 'shocking', 'trap', 'shrinking', 'avoid', 'bad', 'failure', 'warning', 'loss', 'crisis', 'negative', 'scam', 'wrong', 'politics', 'catch-up', 'undress', 'sexualized', 'losing', 'kill', 'warned', 'substitution']
 
@@ -38,7 +35,6 @@ def get_sentiment_label(text):
     else:
         return 0
 
-# --- DATA COLLECTION ---
 def build_dataset():
     if NEWS_API_KEY == '8bb3dc3bb11546d1ab5f9dbe8d0691a8E':
         print("Error: Please paste your News API key in build_dataset.py")
@@ -57,7 +53,7 @@ def build_dataset():
             
             for art in articles:
                 content = art.get('content') or art.get('description') or ''
-                if len(content) < 50: continue # Skip very short snippets
+                if len(content) < 50: continue
                 
                 clean = clean_text(content)
                 label = get_sentiment_label(clean)
@@ -71,7 +67,7 @@ def build_dataset():
         except Exception as e:
             print(f"  Error fetching {topic}: {e}")
         
-        time.sleep(1) # Be nice to the API
+        time.sleep(1)
 
     df = pd.DataFrame(all_articles)
     df.to_csv('expanded_data.csv', index=False)
