@@ -10,11 +10,11 @@ from sklearn.metrics.pairwise import cosine_similarity
 load_dotenv()
 NEWS_API_KEY = os.getenv("NEWS_API_KEY")
 
+STOPWORDS = {'is', 'to', 'the', 'and', 'a', 'in', 'of', 'for', 'on', 'with', 'at', 'by', 'from', 'as', 'it', 'its', 'they', 'are', 'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had', 'do', 'does', 'did', 'but', 'if', 'or', 'because', 'until', 'while', 'about', 'against', 'between', 'into', 'through', 'during', 'before', 'after', 'above', 'below', 'up', 'down', 'out', 'off', 'over', 'under', 'again', 'further', 'then', 'once', 'causing', 'die', 'doing'}
+
 try:
     model = joblib.load('model.pkl')
     tfidf = joblib.load('tfidf_vectorizer.pkl')
-    # df = pd.read_csv("expanded_data.csv") # No longer needed for main loop, but keeping for reference if needed
-    # tfidf_matrix = tfidf.transform(df['clean_text'])
 except Exception as e:
     print(f"Warning: Could not load model: {e}")
     print("Make sure you have run build_dataset.py and file.py first.")
@@ -24,7 +24,6 @@ def fetch_live_news(query):
         print("Error: NEWS_API_KEY not found in .env")
         return []
     
-    query=query.replace(" " , " OR ")
     url = f"https://newsapi.org/v2/everything?q={query}&language=en&sortBy=relevancy&pageSize=20&apiKey={NEWS_API_KEY}"
     
     print(f"\n[DEBUG] Fetching live news for query: '{query}'")
@@ -44,9 +43,6 @@ def fetch_live_news(query):
 
 supportive_words = ['benefit', 'improve', 'enhance', 'support', 'help', 'personalize', 'effective', 'efficient', 'innovative', 'accessible', 'opportunity', 'revolutionize', 'bridge', 'inclusive', 'empower', 'potential', 'success', 'breakthrough', 'advance', 'growth', 'positive', 'win', 'excellent', 'future', 'transform', 'visionary', 'leader']
 opposing_words = ['harm', 'risk', 'cheat', 'replace', 'danger', 'mislead', 'bias', 'concern', 'threat', 'plagiarism', 'dependency', 'decline', 'weaken', 'destroy', 'erosion', 'shocking', 'trap', 'shrinking', 'avoid', 'bad', 'failure', 'warning', 'loss', 'crisis', 'negative', 'scam', 'wrong', 'politics', 'catch-up', 'undress', 'sexualized', 'losing', 'kill', 'warned', 'substitution']
-
-# List of terms that are highly relevant to the AI/Tech topic
-# This helps boost similarity for articles that use specific industry jargon
 TOPIC_KEYWORDS = {
     'ai': 0.3, 'artificial intelligence': 0.4, 'llm': 0.3, 'gpt': 0.3, 
     'openai': 0.3, 'anthropic': 0.3, 'google gemini': 0.3, 'meta': 0.2, 
@@ -69,47 +65,30 @@ def get_custom_features(text):
 
 def contranian_from_text(text, top=3):
     clean_input = clean_text(text)
-    
-    # Predict sentiment of input
     vec_input = tfidf.transform([clean_input])
     custom_input = get_custom_features(clean_input)
     features_input = np.hstack((vec_input.toarray(), custom_input))
     target_label = int(model.predict(features_input)[0])
-    
-    # Fetch live news related to the input
-    # Use the first 5 words for a better search query
-    query_words = clean_input.split()[:5]
-    search_query = " ".join(query_words)
-    
+    query_words = [w for w in clean_input.split() if w not in STOPWORDS]
+    search_query = " ".join(query_words[:3])
     articles = fetch_live_news(search_query)
-    
     results = []
     print(f"[DEBUG] Analyzing articles for contrarian views (Input Sentiment: {target_label})...")
-    
     for art in articles:
         title = art.get('title', '')
         if not title: continue
-        
         clean_title = clean_text(title)
         vec_art = tfidf.transform([clean_title])
         custom_art = get_custom_features(clean_title)
         features_art = np.hstack((vec_art.toarray(), custom_art))
-        
         article_label = int(model.predict(features_art)[0])
-        
-        # Calculate base similarity
         base_similarity = cosine_similarity(vec_input, vec_art)[0][0]
-        
-        # Apply keyword boosting
         boost = 0
         title_lower = title.lower()
         for kw, val in TOPIC_KEYWORDS.items():
             if kw in title_lower:
                 boost = max(boost, val)
-        
         final_similarity = min(1.0, base_similarity + boost)
-        
-        # Contrarian Logic
         is_contrarian = False
         if target_label == 1 and article_label == -1:
             is_contrarian = True
@@ -120,7 +99,7 @@ def contranian_from_text(text, top=3):
             
         print(f"  - Title: {title[:50]}... | Base Sim: {base_similarity:.2f} | Final Sim: {final_similarity:.2f} | Sentiment: {article_label}")
 
-        if is_contrarian:
+        if is_contrarian and final_similarity > 0.0:
             results.append({
                 "title": title,
                 "predicted": article_label,
