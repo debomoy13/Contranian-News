@@ -108,6 +108,6 @@ def contranian_from_text(text, top=5):
     }
 
 if __name__ == "__main__":
-    test_text = "college education brains." ## for testing 
+    test_text = "The performance is amazing, beautiful, and exciting." ## for testing 
     print(f"Testing with: {test_text}")
     print(contranian_from_text(test_text))

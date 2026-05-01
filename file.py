@@ -4,6 +4,7 @@ import re
 import joblib
 import os
 import requests
+import matplotlib.pyplot as plt
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
@@ -38,6 +39,19 @@ try:
         df_local[['content', 'classification']],
         df_sst[['content', 'classification']]
     ], ignore_index=True)
+    
+    # --- Visualize Class Distribution ---
+    print("Generating class distribution plot...")
+    plt.figure(figsize=(8, 5))
+    df['classification'].value_counts().sort_index().plot(kind='bar', color=['#e74c3c', '#95a5a6', '#2ecc71'])
+    plt.title('Sentiment Class Distribution (-1: Neg, 0: Neu, 1: Pos)')
+    plt.xlabel('Sentiment Class')
+    plt.ylabel('Number of Samples')
+    plt.xticks(rotation=0)
+    plt.grid(axis='y', linestyle='--', alpha=0.7)
+    plt.savefig('class_distribution.png')
+    print("Plot saved as 'class_distribution.png'")
+    # plt.show() # Uncomment if you want to see the window pop up
     
 except Exception as e:
     print(f"Error loading data: {e}")
