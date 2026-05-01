@@ -24,8 +24,7 @@ def fetch_live_news(query):
         print("Error: NEWS_API_KEY not found in .env")
         return []
     
-    # Clean query for URL
-    query = query.replace(" ", " OR ") # Use OR for broader matching
+    query=query.replace(" " , " OR ")
     url = f"https://newsapi.org/v2/everything?q={query}&language=en&sortBy=relevancy&pageSize=20&apiKey={NEWS_API_KEY}"
     
     print(f"\n[DEBUG] Fetching live news for query: '{query}'")
@@ -141,6 +140,6 @@ def contranian_from_text(text, top=3):
     }
 
 if __name__ == "__main__":
-    test_text = "AI is amazing and will revolutionize education by providing personal help to every student." ## for testing 
+    test_text = "college education is killing brains." ## for testing 
     print(f"Testing with: {test_text}")
     print(contranian_from_text(test_text))

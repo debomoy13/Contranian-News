@@ -67,20 +67,29 @@ document.addEventListener('DOMContentLoaded', () => {
             `;
 
             if (data.results && data.results.length > 0) {
+                let foundValid = false;
                 data.results.forEach(article => {
-                    const articleSentiment = getSentimentLabel(article.predicted);
-                    const similarityPct = (article.similarity * 100).toFixed(1);
-                    
-                    html += `
-                        <div class="result-card">
-                            <h4 class="result-title">${article.title}</h4>
-                            <div class="result-meta">
-                                <span><span class="sentiment-badge ${articleSentiment.class}">${articleSentiment.label}</span></span>
-                                <span>Similarity: ${similarityPct}%</span>
+                    if (article.similarity > 0) {
+                        foundValid = true;
+                        const articleSentiment = getSentimentLabel(article.predicted);
+                        const similarityPct = (article.similarity * 100).toFixed(1);
+                        
+                        html += `
+                            <div class="result-card">
+                                <h4 class="result-title">${article.title}</h4>
+                                <div class="result-meta">
+                                    <span><span class="sentiment-badge ${articleSentiment.class}">${articleSentiment.label}</span></span>
+                                    <span>Relevance: ${similarityPct}%</span>
+                                </div>
+                                <a href="${article.url}" target="_blank" class="read-more">Read Full Article →</a>
                             </div>
-                        </div>
-                    `;
+                        `;
+                    }
                 });
+
+                if (!foundValid) {
+                    html += `<p>No relevant contrarian viewpoints found for this specific topic.</p>`;
+                }
             } else {
                 html += `<p>No contrarian viewpoints found for this topic in the database.</p>`;
             }
