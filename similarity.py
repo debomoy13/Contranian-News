@@ -12,35 +12,22 @@ NEWS_API_KEY = os.getenv("NEWS_API_KEY")
 
 IGNORE_WORDS = {'is', 'to', 'the', 'and', 'a', 'in', 'of', 'for', 'on', 'with', 'at', 'by', 'from', 'as', 'it', 'its', 'they', 'are', 'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had', 'do', 'does', 'did', 'but', 'if', 'or', 'because', 'until', 'while', 'about', 'against', 'between', 'into', 'through', 'during', 'before', 'after', 'above', 'below', 'up', 'down', 'out', 'off', 'over', 'under', 'again', 'further', 'then', 'once', 'causing', 'die', 'doing'}
 
-try:
-    model = joblib.load('model.pkl')
-    tfidf = joblib.load('tfidf_vectorizer.pkl')
-except Exception as e:
-    print(f"Warning: Could not load model: {e}")
-    print("Make sure you have run build_dataset.py and file.py first.")
 
+model = joblib.load('model.pkl')
+tfidf = joblib.load('tfidf_vectorizer.pkl')
 def fetch_live_news(query):
-    if not NEWS_API_KEY:
-        print("Error: NEWS_API_KEY not found in .env")
-        return []
     
     url = f"https://newsapi.org/v2/everything?q={query}&language=en&sortBy=relevancy&pageSize=20&apiKey={NEWS_API_KEY}"
-    
-    print(f"\n[DEBUG] Fetching live news for query: '{query}'")
-    try:
-        response = requests.get(url)
-        data = response.json()
-        if data.get("status") == "ok":
-            articles = data.get("articles", [])
-            print(f"[DEBUG] Successfully fetched {len(articles)} articles.")
-            return articles
-        else:
-            print(f"[DEBUG] NewsAPI Error: {data.get('message')}")
-            return []
-    except Exception as e:
-        print(f"[DEBUG] Error fetching news: {e}")
-        return []
 
+    response = requests.get(url)
+    data = response.json()
+    if data.get("status") == "ok":
+        articles = data.get("articles", [])
+        print(f"[DEBUG] Successfully fetched {len(articles)} articles.")
+        return articles
+    else:
+        print(f"[DEBUG] NewsAPI Error: {data.get('message')}")
+        return []
 supportive_words = ['benefit', 'improve', 'enhance', 'support', 'help', 'personalize', 'effective', 'efficient', 'innovative', 'accessible', 'opportunity', 'revolutionize', 'bridge', 'inclusive', 'empower', 'potential', 'success', 'breakthrough', 'advance', 'growth', 'positive', 'win', 'excellent', 'future', 'transform', 'visionary', 'leader']
 opposing_words = ['harm', 'risk', 'cheat', 'replace', 'danger', 'mislead', 'bias', 'concern', 'threat', 'plagiarism', 'dependency', 'decline', 'weaken', 'destroy', 'erosion', 'shocking', 'trap', 'shrinking', 'avoid', 'bad', 'failure', 'warning', 'loss', 'crisis', 'negative', 'scam', 'wrong', 'politics', 'catch-up', 'undress', 'sexualized', 'losing', 'kill', 'warned', 'substitution']
 
@@ -67,7 +54,6 @@ def contranian_from_text(text, top=3):
     search_query = " ".join(query_words[:10])
     articles = fetch_live_news(search_query)
     results = []
-    print(f"[DEBUG] Analyzing articles for contrarian views (Input Sentiment: {target_label})...")
     for art in articles:
         title = art.get('title', '')
         if not title: continue
