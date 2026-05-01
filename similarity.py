@@ -23,10 +23,10 @@ def fetch_live_news(query):
     data = response.json()
     if data.get("status") == "ok":
         articles = data.get("articles", [])
-        print(f"[DEBUG] Successfully fetched {len(articles)} articles.")
+        print(f"Successfully fetched {len(articles)} articles.")
         return articles
-    else:
-        print(f"[DEBUG] NewsAPI Error: {data.get('message')}")
+    else: # fallback for newsapi 
+        print(f"NewsAPI Error: {data.get('message')}")
         return []
 supportive_words = ['benefit', 'improve', 'enhance', 'support', 'help', 'personalize', 'effective', 'efficient', 'innovative', 'accessible', 'opportunity', 'revolutionize', 'bridge', 'inclusive', 'empower', 'potential', 'success', 'breakthrough', 'advance', 'growth', 'positive', 'win', 'excellent', 'future', 'transform', 'visionary', 'leader']
 opposing_words = ['harm', 'risk', 'cheat', 'replace', 'danger', 'mislead', 'bias', 'concern', 'threat', 'plagiarism', 'dependency', 'decline', 'weaken', 'destroy', 'erosion', 'shocking', 'trap', 'shrinking', 'avoid', 'bad', 'failure', 'warning', 'loss', 'crisis', 'negative', 'scam', 'wrong', 'politics', 'catch-up', 'undress', 'sexualized', 'losing', 'kill', 'warned', 'substitution']
