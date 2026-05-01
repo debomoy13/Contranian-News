@@ -10,7 +10,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 load_dotenv()
 NEWS_API_KEY = os.getenv("NEWS_API_KEY")
 
-STOPWORDS = {'is', 'to', 'the', 'and', 'a', 'in', 'of', 'for', 'on', 'with', 'at', 'by', 'from', 'as', 'it', 'its', 'they', 'are', 'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had', 'do', 'does', 'did', 'but', 'if', 'or', 'because', 'until', 'while', 'about', 'against', 'between', 'into', 'through', 'during', 'before', 'after', 'above', 'below', 'up', 'down', 'out', 'off', 'over', 'under', 'again', 'further', 'then', 'once', 'causing', 'die', 'doing'}
+IGNORE_WORDS = {'is', 'to', 'the', 'and', 'a', 'in', 'of', 'for', 'on', 'with', 'at', 'by', 'from', 'as', 'it', 'its', 'they', 'are', 'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had', 'do', 'does', 'did', 'but', 'if', 'or', 'because', 'until', 'while', 'about', 'against', 'between', 'into', 'through', 'during', 'before', 'after', 'above', 'below', 'up', 'down', 'out', 'off', 'over', 'under', 'again', 'further', 'then', 'once', 'causing', 'die', 'doing'}
 
 try:
     model = joblib.load('model.pkl')
@@ -43,12 +43,6 @@ def fetch_live_news(query):
 
 supportive_words = ['benefit', 'improve', 'enhance', 'support', 'help', 'personalize', 'effective', 'efficient', 'innovative', 'accessible', 'opportunity', 'revolutionize', 'bridge', 'inclusive', 'empower', 'potential', 'success', 'breakthrough', 'advance', 'growth', 'positive', 'win', 'excellent', 'future', 'transform', 'visionary', 'leader']
 opposing_words = ['harm', 'risk', 'cheat', 'replace', 'danger', 'mislead', 'bias', 'concern', 'threat', 'plagiarism', 'dependency', 'decline', 'weaken', 'destroy', 'erosion', 'shocking', 'trap', 'shrinking', 'avoid', 'bad', 'failure', 'warning', 'loss', 'crisis', 'negative', 'scam', 'wrong', 'politics', 'catch-up', 'undress', 'sexualized', 'losing', 'kill', 'warned', 'substitution']
-TOPIC_KEYWORDS = {
-    'ai': 0.3, 'artificial intelligence': 0.4, 'llm': 0.3, 'gpt': 0.3, 
-    'openai': 0.3, 'anthropic': 0.3, 'google gemini': 0.3, 'meta': 0.2, 
-    'agi': 0.4, 'cybersecurity': 0.2, 'automation': 0.2, 'robotics': 0.2,
-    'machine learning': 0.3, 'deep learning': 0.3
-}
 
 def clean_text(text):
     if not isinstance(text, str): return ''
@@ -63,13 +57,13 @@ def get_custom_features(text):
     opp = sum(1 for word in tokens if word in opposing_words)
     return np.array([[sup, opp]])
 
-def contranian_from_text(text, top=3):
+def contranian_from_text(text, top=5):
     clean_input = clean_text(text)
     vec_input = tfidf.transform([clean_input])
     custom_input = get_custom_features(clean_input)
     features_input = np.hstack((vec_input.toarray(), custom_input))
     target_label = int(model.predict(features_input)[0])
-    query_words = [w for w in clean_input.split() if w not in STOPWORDS]
+    query_words = [w for w in clean_input.split() if w not in IGNORE_WORDS]
     search_query = " ".join(query_words[:3])
     articles = fetch_live_news(search_query)
     results = []
@@ -83,12 +77,7 @@ def contranian_from_text(text, top=3):
         features_art = np.hstack((vec_art.toarray(), custom_art))
         article_label = int(model.predict(features_art)[0])
         base_similarity = cosine_similarity(vec_input, vec_art)[0][0]
-        boost = 0
-        title_lower = title.lower()
-        for kw, val in TOPIC_KEYWORDS.items():
-            if kw in title_lower:
-                boost = max(boost, val)
-        final_similarity = min(1.0, base_similarity + boost)
+        final_similarity = base_similarity
         is_contrarian = False
         if target_label == 1 and article_label == -1:
             is_contrarian = True
@@ -119,6 +108,6 @@ def contranian_from_text(text, top=3):
     }
 
 if __name__ == "__main__":
-    test_text = "college education is killing brains." ## for testing 
+    test_text = "college education brains." ## for testing 
     print(f"Testing with: {test_text}")
     print(contranian_from_text(test_text))
