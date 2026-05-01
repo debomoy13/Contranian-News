@@ -5,6 +5,7 @@
 *.csv
 *.xlsx
 *.xls
+*.tsv
 
 # ML Models
 *.pkl
