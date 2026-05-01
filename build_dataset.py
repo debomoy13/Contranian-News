@@ -24,8 +24,8 @@ def clean_text(text):
 
 def get_sentiment_label(text):
     tokens = text.lower().split()
-    sup = sum(1 for word in tokens if word in supportive_words) #comprehensive looping 
-    opp = sum(1 for word in tokens if word in opposing_words) #comprehensive looping 
+    sup = sum(1 for word in tokens if word in supportive_words)
+    opp = sum(1 for word in tokens if word in opposing_words)
     blob = TextBlob(text).sentiment.polarity
     
     if opp > sup and (opp >= 1 or blob < -0.01):
@@ -36,7 +36,7 @@ def get_sentiment_label(text):
         return 0
 
 def build_dataset():
-    if NEWS_API_KEY == '8bb3dc3bb11546d1ab5f9dbe8d0691a8E': ### DATA ENV file leaked Check later 
+    if NEWS_API_KEY == '8bb3dc3bb11546d1ab5f9dbe8d0691a8E': 
         print("Error: Please paste your News API key in build_dataset.py")
         return
 
@@ -67,7 +67,7 @@ def build_dataset():
         except Exception as e:
             print(f"  Error fetching {topic}: {e}")
         
-        time.sleep(1) #putting api to sleep . CLosing the api to work 
+        time.sleep(1) 
 
     df = pd.DataFrame(all_articles)
     df.to_csv('expanded_data.csv', index=False)

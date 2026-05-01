@@ -57,14 +57,14 @@ def get_custom_features(text):
     opp = sum(1 for word in tokens if word in opposing_words)
     return np.array([[sup, opp]])
 
-def contranian_from_text(text, top=5):
+def contranian_from_text(text, top=3):
     clean_input = clean_text(text)
     vec_input = tfidf.transform([clean_input])
     custom_input = get_custom_features(clean_input)
     features_input = np.hstack((vec_input.toarray(), custom_input))
     target_label = int(model.predict(features_input)[0])
     query_words = [w for w in clean_input.split() if w not in IGNORE_WORDS]
-    search_query = " ".join(query_words[:3])
+    search_query = " ".join(query_words[:10])
     articles = fetch_live_news(search_query)
     results = []
     print(f"[DEBUG] Analyzing articles for contrarian views (Input Sentiment: {target_label})...")
@@ -77,7 +77,11 @@ def contranian_from_text(text, top=5):
         features_art = np.hstack((vec_art.toarray(), custom_art))
         article_label = int(model.predict(features_art)[0])
         base_similarity = cosine_similarity(vec_input, vec_art)[0][0]
-        final_similarity = base_similarity
+        
+        matches = sum(1 for kw in query_words if kw in clean_title)
+        boost = matches * 0.2
+        final_similarity = min(1.0, base_similarity + boost)
+        
         is_contrarian = False
         if target_label == 1 and article_label == -1:
             is_contrarian = True
@@ -108,6 +112,6 @@ def contranian_from_text(text, top=5):
     }
 
 if __name__ == "__main__":
-    test_text = "The performance is amazing, beautiful, and exciting." ## for testing 
+    test_text = "college education making students outdated."
     print(f"Testing with: {test_text}")
     print(contranian_from_text(test_text))

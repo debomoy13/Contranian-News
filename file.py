@@ -10,7 +10,6 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report
 
-# --- SST-2 Dataset Download ---
 def download_sst2():
     url = "https://raw.githubusercontent.com/clairett/pytorch-sentiment-classification/master/data/SST2/train.tsv"
     filename = "sst2_train.tsv"
@@ -21,26 +20,20 @@ def download_sst2():
             f.write(response.content)
     return pd.read_csv(filename, sep='\t', names=['text', 'label'])
 
-# --- Loading Data ---
 try:
-    # Load your local news data
     df_local = pd.read_csv("expanded_data.csv")
     print(f"Loaded {len(df_local)} local articles.")
     
-    # Load SST-2 data
     df_sst = download_sst2()
-    # Map SST-2 labels (0: negative, 1: positive) to (-1, 1)
     df_sst['classification'] = df_sst['label'].map({0: -1, 1: 1})
     df_sst = df_sst.rename(columns={'text': 'content'})
     print(f"Loaded {len(df_sst)} SST-2 samples.")
     
-    # Combine datasets
     df = pd.concat([
         df_local[['content', 'classification']],
         df_sst[['content', 'classification']]
     ], ignore_index=True)
     
-    # --- Visualize Class Distribution ---
     print("Generating class distribution plot...")
     plt.figure(figsize=(8, 5))
     df['classification'].value_counts().sort_index().plot(kind='bar', color=['#e74c3c', '#95a5a6', '#2ecc71'])
@@ -51,7 +44,6 @@ try:
     plt.grid(axis='y', linestyle='--', alpha=0.7)
     plt.savefig('class_distribution.png')
     print("Plot saved as 'class_distribution.png'")
-    # plt.show() # Uncomment if you want to see the window pop up
     
 except Exception as e:
     print(f"Error loading data: {e}")
@@ -67,7 +59,6 @@ def clean_text(text):
 print("Preprocessing data...")
 df['clean_text'] = df['content'].apply(clean_text)
 
-# Keyword scores (Design features)
 supportive_words = ['benefit', 'improve', 'enhance', 'support', 'help', 'personalize', 'effective', 'efficient', 'innovative', 'accessible', 'opportunity', 'revolutionize', 'bridge', 'inclusive', 'empower', 'potential', 'success', 'breakthrough', 'advance', 'growth', 'positive', 'win', 'excellent', 'future', 'transform', 'visionary', 'leader']
 opposing_words = ['harm', 'risk', 'cheat', 'replace', 'danger', 'mislead', 'bias', 'concern', 'threat', 'plagiarism', 'dependency', 'decline', 'weaken', 'destroy', 'erosion', 'shocking', 'trap', 'shrinking', 'avoid', 'bad', 'failure', 'warning', 'loss', 'crisis', 'negative', 'scam', 'wrong', 'politics', 'catch-up', 'undress', 'sexualized', 'losing', 'kill', 'warned', 'substitution']
 
@@ -81,9 +72,8 @@ scores = df['clean_text'].apply(get_scores)
 df['support_score'] = [s[0] for s in scores]
 df['oppose_score'] = [s[1] for s in scores]
 
-# --- Training ---
 print("Training model (this may take a moment)...")
-tfidf = TfidfVectorizer(max_features=1000) # Increased features for better accuracy
+tfidf = TfidfVectorizer(max_features=1000) 
 x_tfidf = tfidf.fit_transform(df['clean_text'])
 custom_features = df[['support_score', 'oppose_score']].values
 x = np.hstack((x_tfidf.toarray(), custom_features))
@@ -97,7 +87,6 @@ model.fit(x_train, y_train)
 print("\nModel Evaluation:")
 print(classification_report(y_test, model.predict(x_test)))
 
-# Save
 joblib.dump(model, 'model.pkl')
 joblib.dump(tfidf, 'tfidf_vectorizer.pkl')
 print("\nSuccess: Saved improved model to 'model.pkl'")

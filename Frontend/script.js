@@ -69,7 +69,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (data.results && data.results.length > 0) {
                 let foundValid = false;
                 data.results.forEach(article => {
-                    if (article.similarity > 0) {
+                    if (article.similarity >= 0.6) {
                         foundValid = true;
                         const articleSentiment = getSentimentLabel(article.predicted);
                         const similarityPct = (article.similarity * 100).toFixed(1);
