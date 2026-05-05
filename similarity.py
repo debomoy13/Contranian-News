@@ -56,7 +56,6 @@ def contranian_from_text(text, top=3):
     results = []
     for art in articles:
         title = art.get('title', '')
-        if not title: continue
         clean_title = clean_text(title)
         vec_art = tfidf.transform([clean_title])
         custom_art = get_custom_features(clean_title)
