@@ -133,17 +133,98 @@ body {
 
 /* Content Area */
 .content-area {
-  padding: 4rem 2rem;
-  text-align: center;
+  padding: 2rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 .loading-text {
+  grid-column: 1 / -1;
   font-size: 1rem;
   color: var(--text-secondary);
   letter-spacing: 0.1em;
+  text-align: center;
+  padding: 4rem 0;
 }
 
-/* Paste Section */
+/* News Card Specifics */
+.news-card {
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  padding: 0; /* Remove padding because image should be edge-to-edge */
+}
+
+.news-image-container {
+  width: 100%;
+  height: 180px;
+  overflow: hidden;
+  border-bottom: 1px solid #ddd;
+}
+
+.news-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.news-card:hover .news-image {
+  transform: scale(1.05);
+}
+
+.news-content {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.source-badge {
+  background-color: var(--border-color);
+  color: white;
+  padding: 0.2rem 0.6rem;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  font-weight: bold;
+}
+
+.result-description {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-bottom: 1.5rem;
+  line-height: 1.6;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.read-more {
+  display: inline-block;
+  color: var(--accent-color);
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 0.9rem;
+  transition: letter-spacing 0.2s ease;
+}
+
+.read-more:hover {
+  letter-spacing: 0.05em;
+}
+
+/* Paste Section Results */
+.results-container .result-card {
+  max-width: 800px;
+}
+
+/* Paste Section adjustments */
 .paste-container {
   padding: 4rem 2rem;
   max-width: 800px;
@@ -246,6 +327,7 @@ body {
   align-items: center;
   font-size: 0.85rem;
   color: var(--text-secondary);
+  margin-bottom: 0.5rem;
 }
 
 .sentiment-badge {

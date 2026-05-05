@@ -50,8 +50,17 @@ def contranian_from_text(text, top=3):
     custom_input = get_custom_features(clean_input)
     features_input = np.hstack((vec_input.toarray(), custom_input))
     target_label = int(model.predict(features_input)[0])
+    # Improve search query by focusing on subjects rather than the full claim
+    # For "Sugar is worst enemy", we want to search for "Sugar diabetes myths" or "Sugar diabetes debate"
     query_words = [w for w in clean_input.split() if w not in IGNORE_WORDS]
-    search_query = " ".join(query_words[:10])
+    
+    # Take the top 2-3 subject words and add 'debate' or 'myths' to find opposing views
+    base_query = " ".join(query_words[:3])
+    search_query = f"{base_query} myths OR {base_query} debate OR {base_query} rethinking"
+    
+    print(f"[DEBUG] Original Input: {text}")
+    print(f"[DEBUG] Generated Search Query: {search_query}")
+    
     articles = fetch_live_news(search_query)
     results = []
     for art in articles:
